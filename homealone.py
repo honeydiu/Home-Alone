@@ -7,18 +7,17 @@ class Scene(object):
 
 class Engine(object):
 
-    def __init__(self, scene_map):
-        self.scene_map = scene_map
+    def __init__(self, map):
+        self.map = map
 
     def play(self):
-        current_scene = self.scene_map.begin()
-        last_scene = self.scene_map.next_scene('finished')
+        current_room = self.map.begin()
+        loop = 1
+        while loop == 1:
+            next = current_room.enter()
+            current_room = self.map.next_room(next)
 
-        while current_scene != last_scene:
-            next_scene_name = current_scene.enter()
-            current_scene = self.scene_map.next_scene(next_scene_name)
-
-        current_scene.enter()
+        current_room.enter()
 
 class Item(object):
     def __init__(self,name,description):
@@ -233,7 +232,7 @@ class Map(object):
     def enter(self):
         pass
 
-    scenes = {
+    rooms = {
         'opening': Opening(),
         'lobby_intro': Lobby_Intro(),
         'lobby': Lobby(),
@@ -242,15 +241,15 @@ class Map(object):
         'kitchen': Kitchen()
     }
 
-    def __init__(self, start_scene):
-        self.start_scene = start_scene
+    def __init__(self, first_room):
+        self.first_room = first_room
 
-    def next_scene(self, scene_name):
-        val = Map.scenes.get(scene_name)
-        return val
+    def next_room(self, name):
+        room = Map.rooms.get(name)
+        return room
 
     def begin(self):
-        return self.next_scene(self.start_scene)
+        return self.next_room(self.first_room)
 
 a_map = Map('opening')
 a_game = Engine(a_map)
